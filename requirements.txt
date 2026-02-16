@@ -1,0 +1,4 @@
+pynput>=1.7.6
+appdirs>=1.4.4
+pyinstaller>=5.1.0
+pyinstaller-hooks-contrib>=2024.6.0
