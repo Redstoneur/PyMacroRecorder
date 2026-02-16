@@ -28,7 +28,9 @@ class Player:
         self._stop_event.clear()
         self._thread = threading.Thread(target=self._run, args=(macro, repeats), daemon=True)
         self._thread.start()
-        self.log(f"Playing macro '{macro.name}' (repeats: {'infinite' if repeats == 0 else repeats})")
+        self.log(
+            f"Playing macro '{macro.name}' (repeats: {'infinite' if repeats == 0 else repeats})"
+        )
 
     def stop(self) -> None:
         self._stop_event.set()

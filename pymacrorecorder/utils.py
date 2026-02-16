@@ -21,6 +21,36 @@ def button_to_str(btn: mouse.Button) -> str:
     return btn.name if hasattr(btn, "name") else str(btn)
 
 
+def normalize_label(label: str) -> str:
+    if label.startswith("<") and label.endswith(">"):
+        inner = label[1:-1]
+        if inner.startswith("vk_"):
+            try:
+                vk = int(inner.replace("vk_", ""))
+            except ValueError:
+                return label
+            if 0x30 <= vk <= 0x39:  # digits
+                return chr(vk)
+            if 0x41 <= vk <= 0x5A:  # letters A-Z
+                return chr(vk + 32)  # lower-case alpha for pynput parser
+        return f"<{inner.lower()}>"
+    if len(label) == 1:
+        return label.lower()
+    return label
+
+
+def normalize_combo(combo: Iterable[str]) -> List[str]:
+    return [normalize_label(x) for x in combo]
+
+
+def is_parseable_hotkey(combo_str: str) -> bool:
+    try:
+        keyboard.HotKey.parse(combo_str)
+        return True
+    except Exception:
+        return False
+
+
 def str_to_key(label: str) -> keyboard.Key | keyboard.KeyCode:
     if not label:
         return keyboard.KeyCode.from_char(" ")

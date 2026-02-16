@@ -33,8 +33,12 @@ class Recorder:
         self._last_time = time.time()
         self._running.set()
         self._pressed.clear()
-        self._keyboard_listener = keyboard.Listener(on_press=self._on_key_press, on_release=self._on_key_release)
-        self._mouse_listener = mouse.Listener(on_click=self._on_click, on_scroll=self._on_scroll, on_move=self._on_move)
+        self._keyboard_listener = keyboard.Listener(
+            on_press=self._on_key_press, on_release=self._on_key_release
+        )
+        self._mouse_listener = mouse.Listener(
+            on_click=self._on_click, on_scroll=self._on_scroll, on_move=self._on_move
+        )
         self._keyboard_listener.start()
         self._mouse_listener.start()
         self.log("Recording started")
@@ -85,7 +89,15 @@ class Recorder:
             return
         if self._should_ignore(self._pressed):
             return
-        self._add_event("mouse_click", {"x": x, "y": y, "button": button_to_str(button), "action": "press" if pressed else "release"})
+        self._add_event(
+            "mouse_click",
+            {
+                "x": x,
+                "y": y,
+                "button": button_to_str(button),
+                "action": "press" if pressed else "release"
+            }
+        )
 
     def _on_scroll(self, x: int, y: int, dx: int, dy: int) -> None:
         if not self._running.is_set():

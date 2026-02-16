@@ -8,6 +8,8 @@ from typing import Dict, List
 
 from appdirs import user_data_dir
 
+from .utils import format_combo, is_parseable_hotkey, normalize_combo
+
 APP_NAME = "PyMacroRecorder"
 APP_AUTHOR = "PyMacroRecorder"
 CONFIG_NAME = "config.json"
@@ -40,13 +42,21 @@ def load_config() -> Dict[str, Dict[str, List[str]]]:
     hotkeys = data.get("hotkeys", {})
     merged = DEFAULT_HOTKEYS.copy()
     merged.update({k: v for k, v in hotkeys.items() if isinstance(v, list)})
-    return {"hotkeys": merged}
+    sanitized: Dict[str, List[str]] = {}
+    for action, combo in merged.items():
+        normalized = normalize_combo(combo)
+        combo_str = format_combo(normalized)
+        if is_parseable_hotkey(combo_str):
+            sanitized[action] = normalized
+        else:
+            sanitized[action] = DEFAULT_HOTKEYS.get(action, DEFAULT_HOTKEYS["start_record"])
+    return {"hotkeys": sanitized}
 
 
 def save_config(config: Dict[str, Dict[str, List[str]]]) -> None:
     path = _config_path()
-    payload = {"hotkeys": config.get("hotkeys", DEFAULT_HOTKEYS)}
+    hotkeys = config.get("hotkeys", DEFAULT_HOTKEYS)
+    normalized = {k: normalize_combo(v) for k, v in hotkeys.items()}
+    payload = {"hotkeys": normalized}
     with path.open("w", encoding="utf-8") as fh:
         json.dump(payload, fh, indent=2)
-
-

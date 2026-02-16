@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, Optional
 
 from pynput import keyboard
 
-from .utils import format_combo
+from .utils import format_combo, is_parseable_hotkey, key_to_str, normalize_combo
 
 HotkeyCallback = Callable[[str], None]
 
@@ -37,7 +37,15 @@ class HotkeyManager:
     def _restart(self) -> None:
         if self._listener:
             self._listener.stop()
-        hotkey_map = {format_combo(v): (lambda action=k: self.dispatcher(action)) for k, v in self.mapping.items() if len(v) >= 2}
+        hotkey_map: Dict[str, Callable[[], None]] = {}
+        for action, combo in self.mapping.items():
+            if len(combo) < 2:
+                continue
+            normalized = normalize_combo(combo)
+            combo_str = format_combo(normalized)
+            if not is_parseable_hotkey(combo_str):
+                continue
+            hotkey_map[combo_str] = lambda action=action: self.dispatcher(action)
         if hotkey_map:
             self._listener = keyboard.GlobalHotKeys(hotkey_map)
             self._listener.start()
@@ -50,7 +58,7 @@ def capture_hotkey_blocking(min_keys: int = 2, timeout: int = 10) -> Optional[Li
     done = threading.Event()
 
     def on_press(key: keyboard.Key | keyboard.KeyCode) -> None:
-        label = key.char if isinstance(key, keyboard.KeyCode) and key.char else f"<{key.name}>"
+        label = key_to_str(key)
         if label and label not in combo:
             combo.append(label)
 
@@ -66,6 +74,5 @@ def capture_hotkey_blocking(min_keys: int = 2, timeout: int = 10) -> Optional[Li
     listener.stop()
     listener.join()
     if len(combo) >= min_keys:
-        return combo
+        return normalize_combo(combo)
     return None
-

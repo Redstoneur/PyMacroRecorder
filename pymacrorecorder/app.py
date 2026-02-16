@@ -37,12 +37,15 @@ class App(tk.Tk):
         controls.pack(fill="x", padx=10, pady=5)
 
         self.start_rec_btn = ttk.Button(controls, text="Start Record", command=self.start_recording)
-        self.stop_rec_btn = ttk.Button(controls, text="Stop Record", command=self.stop_recording, state="disabled")
+        self.stop_rec_btn = ttk.Button(controls, text="Stop Record", command=self.stop_recording,
+                                       state="disabled")
         self.start_play_btn = ttk.Button(controls, text="Start Macro", command=self.start_playback)
-        self.stop_play_btn = ttk.Button(controls, text="Stop Macro", command=self.stop_playback, state="disabled")
+        self.stop_play_btn = ttk.Button(controls, text="Stop Macro", command=self.stop_playback,
+                                        state="disabled")
         self.save_btn = ttk.Button(controls, text="Save Macro", command=self.save_macro)
         self.load_btn = ttk.Button(controls, text="Load Macro", command=self.load_macro)
-        self.delete_btn = ttk.Button(controls, text="Delete Selected", command=self._delete_selected_events)
+        self.delete_btn = ttk.Button(controls, text="Delete Selected",
+                                     command=self._delete_selected_events)
 
         self.start_rec_btn.grid(row=0, column=0, padx=5, pady=2)
         self.stop_rec_btn.grid(row=0, column=1, padx=5, pady=2)
@@ -70,7 +73,7 @@ class App(tk.Tk):
         for col in columns:
             self.preview.column(col, width=150, anchor="w")
         self.preview.pack(fill="both", expand=True)
-        self.preview.bind("<Delete>", self._delete_selected_events)
+        self.preview.bind("<Delete>", lambda e: self._delete_selected_events())
 
         log_frame = ttk.LabelFrame(self, text="Log")
         log_frame.pack(fill="both", expand=True, padx=10, pady=5)
@@ -90,10 +93,11 @@ class App(tk.Tk):
             ("load_macro", "Load Macro"),
         ]:
             ttk.Label(hotkey_frame, text=label).grid(row=row, column=0, sticky="w", padx=4, pady=2)
-            l = tk.Label(hotkey_frame, text="", relief=tk.SOLID, borderwidth=1, padx=4, pady=2, cursor="hand2")
-            l.grid(row=row, column=1, sticky="w", padx=4, pady=2)
-            l.bind("<Button-1>", lambda _e, act=action: self._start_hotkey_capture(act))
-            self.hotkey_labels[action] = l
+            hotkey_label = tk.Label(hotkey_frame, text="", relief="solid", borderwidth=1,
+                                    padx=4, pady=2, cursor="hand2")
+            hotkey_label.grid(row=row, column=1, sticky="w", padx=4, pady=2)
+            hotkey_label.bind("<Button-1>", lambda _e, act=action: self._start_hotkey_capture(act))
+            self.hotkey_labels[action] = hotkey_label
             row += 1
 
     def _log(self, msg: str) -> None:
@@ -147,7 +151,8 @@ class App(tk.Tk):
             return
         for idx, evt in enumerate(macro.events, start=1):
             detail = ", ".join(f"{k}={v}" for k, v in evt.payload.items())
-            self.preview.insert("", "end", values=(idx, evt.event_type, detail, evt.delay_ms))
+            self.preview.insert("", "end", values=(idx, evt.event_type, detail,
+                                                   evt.delay_ms))
 
     def _delete_selected_events(self, _event: Optional[tk.Event] = None) -> None:
         if not self.current_macro or self.current_macro.is_empty():
@@ -193,11 +198,13 @@ class App(tk.Tk):
         if not self.current_macro or self.current_macro.is_empty():
             messagebox.showwarning("Save", "No macro to save")
             return
-        name = simpledialog.askstring("Name", "Macro name", initialvalue=self.current_macro.name)
+        name = simpledialog.askstring("Name", "Macro name",
+                                      initialvalue=self.current_macro.name)
         if not name:
             return
         self.current_macro.name = name
-        path_str = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV", "*.csv")], title="Save macro")
+        path_str = filedialog.asksaveasfilename(defaultextension=".csv",
+                                                filetypes=[("CSV", "*.csv")], title="Save macro")
         if not path_str:
             return
         save_macro_to_csv(Path(path_str), self.current_macro)
@@ -214,7 +221,10 @@ class App(tk.Tk):
         macro = macros[0]
         if len(macros) > 1:
             names = [m.name for m in macros]
-            choice = simpledialog.askstring("Selection", f"Available macros: {', '.join(names)}\nName to load:")
+            choice = simpledialog.askstring(
+                "Selection",
+                f"Available macros: {', '.join(names)}\nName to load:"
+            )
             if choice:
                 for m in macros:
                     if m.name == choice:
