@@ -1,2 +1,2 @@
 # PyMacroRecorder
-Application Python multiplateforme (Windows/Linux) pour enregistrer, rejouer et sauvegarder des macros clavier et souris en temps réel.
+Cross-platform Python application (Windows/Linux) for recording, replaying and saving keyboard and mouse macros in real time.
