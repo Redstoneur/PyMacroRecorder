@@ -36,3 +36,45 @@ jobs:
         run: |
           pytest
 
+  build-binaries:
+    name: Build binaries (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            extension: ""
+            shell: bash
+            run_cmd: bash build.sh
+          - os: windows-latest
+            extension: .exe
+            shell: pwsh
+            run_cmd: .\\build.ps1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pyinstaller
+
+      - name: Make build script executable
+        if: runner.os != 'Windows'
+        run: chmod +x build.sh
+
+      - name: Build binary
+        run: ${{ matrix.run_cmd }}
+        shell: ${{ matrix.shell }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PyMacroRecorder-${{ runner.os }}${{ matrix.extension }}
+          path: dist/PyMacroRecorder${{ matrix.extension }}

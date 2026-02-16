@@ -13,12 +13,7 @@ $AppName = "PyMacroRecorder"
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $DistDir, $BuildDir, $SpecFile
 
 # Run pyinstaller
-pyinstaller \
-  --onefile \
-  --name "$AppName" \
-  --distpath "$DistDir" \
-  --workpath "$BuildDir" \
-  "$EntryPoint"
+pyinstaller --onefile --name "$AppName" --distpath "$DistDir" --workpath "$BuildDir" "$EntryPoint"
 
 Write-Host "Build complete. Binary located at: $DistDir\$AppName.exe"
 

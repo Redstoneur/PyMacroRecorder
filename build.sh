@@ -14,12 +14,7 @@ APP_NAME="PyMacroRecorder"
 rm -rf "$DIST_DIR" "$BUILD_DIR" "$SPEC_FILE"
 
 # Run pyinstaller
-pyinstaller \
-  --onefile \
-  --name "$APP_NAME" \
-  --distpath "$DIST_DIR" \
-  --workpath "$BUILD_DIR" \
-  "$ENTRYPOINT"
+pyinstaller --onefile --name "$APP_NAME" --distpath "$DIST_DIR" --workpath "$BUILD_DIR" "$ENTRYPOINT"
 
 # Print result path
 echo "Build complete. Binary located at: $DIST_DIR/$APP_NAME"

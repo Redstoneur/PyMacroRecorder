@@ -13,11 +13,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            pyinstaller_os: linux
             extension: ""
+            shell: bash
+            run_cmd: bash build.sh
           - os: windows-latest
-            pyinstaller_os: windows
             extension: .exe
+            shell: pwsh
+            run_cmd: .\\build.ps1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,14 +35,18 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pyinstaller
 
+      - name: Make build script executable
+        if: runner.os != 'Windows'
+        run: chmod +x build.sh
+
       - name: Build binary
-        run: |
-          pyinstaller --onefile --name PyMacroRecorder main.py
+        run: ${{ matrix.run_cmd }}
+        shell: ${{ matrix.shell }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PyMacroRecorder-${{ matrix.pyinstaller_os }}${{ matrix.extension }}
+          name: PyMacroRecorder-${{ runner.os }}${{ matrix.extension }}
           path: dist/PyMacroRecorder${{ matrix.extension }}
 
   release:
@@ -61,4 +67,3 @@ jobs:
             artifacts/**/PyMacroRecorder.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
