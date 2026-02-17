@@ -44,12 +44,8 @@ jobs:
         include:
           - os: ubuntu-latest
             extension: ""
-            shell: bash
-            run_cmd: bash build.sh
           - os: windows-latest
             extension: .exe
-            shell: pwsh
-            run_cmd: .\\build.ps1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,9 +65,13 @@ jobs:
         if: runner.os != 'Windows'
         run: chmod +x build.sh
 
-      - name: Build binary
-        run: ${{ matrix.run_cmd }}
-        shell: ${{ matrix.shell }}
+      - name: Build binary (Linux)
+        if: runner.os != 'Windows'
+        run: bash build.sh
+
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        run: .\build.ps1
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
