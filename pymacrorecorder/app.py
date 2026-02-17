@@ -1,5 +1,6 @@
 """Tkinter application entry point for PyMacroRecorder."""
 
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -27,6 +28,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("PyMacroRecorder")
         self.geometry("900x600")
+        self._set_icon()
 
         cfg = load_config()
         self.hotkeys: Dict[str, List[str]] = cfg.get("hotkeys", DEFAULT_HOTKEYS)
@@ -38,6 +40,36 @@ class App(tk.Tk):
         self._refresh_hotkey_labels()
         self.hotkey_manager = HotkeyManager(self.hotkeys, self._dispatch_hotkey)
         self.hotkey_manager.start()
+
+    def _set_icon(self) -> None:
+        """Set the window icon from the `assets` folder.
+
+        :return: Nothing.
+        :rtype: None
+        """
+        try:
+            # Determine the base path (works for both script and PyInstaller)
+            if getattr(sys, 'frozen', False):
+                # Running as compiled executable
+                # noinspection PyProtectedMember
+                base_path = Path(sys._MEIPASS)
+            else:
+                # Running as script
+                base_path = Path(__file__).parent.parent
+                print(base_path)
+
+            icon_path = base_path / "assets" / "logo.png"
+            if icon_path.exists():
+                icon = tk.PhotoImage(file=str(icon_path))
+                self.iconphoto(True, icon)
+            else:
+                # Fallback to .ico if .png not found
+                icon_ico_path = base_path / "assets" / "logo.ico"
+                if icon_ico_path.exists():
+                    self.iconbitmap(str(icon_ico_path))
+        except Exception as e:
+            # Silently fail if icon cannot be loaded
+            print(f"Warning: Could not load icon: {e}")
 
     def _build_ui(self) -> None:
         """Build the control bar, preview tree, log area, and hotkey editor.

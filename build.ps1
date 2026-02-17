@@ -7,13 +7,14 @@ $DistDir = Join-Path $ProjectRoot "dist"
 $BuildDir = Join-Path $ProjectRoot "build"
 $SpecFile = Join-Path $ProjectRoot "PyMacroRecorder.spec"
 $EntryPoint = Join-Path $ProjectRoot "main.py"
+$IconFile = Join-Path $ProjectRoot "assets\logo.ico"
 $AppName = "PyMacroRecorder"
 
 # Clean previous outputs
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $DistDir, $BuildDir, $SpecFile
 
-# Run pyinstaller
-pyinstaller --onefile --name "$AppName" --distpath "$DistDir" --workpath "$BuildDir" "$EntryPoint"
+# Run pyinstaller with icon and assets
+pyinstaller --onefile --noconsole --name "$AppName" --icon "$IconFile" --add-data "assets;assets" --distpath "$DistDir" --workpath "$BuildDir" "$EntryPoint"
 
 Write-Host "Build complete. Binary located at: $DistDir\$AppName.exe"
 
