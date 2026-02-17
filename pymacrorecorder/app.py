@@ -68,7 +68,7 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
                     self.iconbitmap(str(icon_ico_path))
         except (OSError, tk.TclError) as e:
             # Silently fail if icon cannot be loaded
-            print(f"Warning: Could not load icon: {e}")
+            self._log(f"Warning: Could not load icon: {e}")
 
     def _build_ui(self) -> None:
         """Build the control bar, preview tree, log area, and hotkey editor.
