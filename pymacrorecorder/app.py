@@ -16,7 +16,14 @@ from .utils import format_combo
 
 
 class App(tk.Tk):
+    """Main Tkinter window that orchestrates recording, playback, and storage."""
+
     def __init__(self) -> None:
+        """Initialize the application window, services, and global hotkeys.
+
+        :return: Nothing.
+        :rtype: None
+        """
         super().__init__()
         self.title("PyMacroRecorder")
         self.geometry("900x600")
@@ -33,6 +40,11 @@ class App(tk.Tk):
         self.hotkey_manager.start()
 
     def _build_ui(self) -> None:
+        """Build the control bar, preview tree, log area, and hotkey editor.
+
+        :return: Nothing.
+        :rtype: None
+        """
         controls = ttk.Frame(self)
         controls.pack(fill="x", padx=10, pady=5)
 
@@ -101,20 +113,46 @@ class App(tk.Tk):
             row += 1
 
     def _log(self, msg: str) -> None:
+        """Append a log line to the log text widget.
+
+        :param msg: Message to display.
+        :type msg: str
+        :return: Nothing.
+        :rtype: None
+        """
         self.log_text.configure(state="normal")
         self.log_text.insert("end", msg + "\n")
         self.log_text.see("end")
         self.log_text.configure(state="disabled")
 
     def _refresh_hotkey_labels(self) -> None:
+        """Refresh hotkey label text to reflect current mappings.
+
+        :return: Nothing.
+        :rtype: None
+        """
         for action, label in self.hotkey_labels.items():
             combo = self.hotkeys.get(action, [])
             label.configure(text=format_combo(combo) if combo else "(none)")
 
     def _dispatch_hotkey(self, action: str) -> None:
+        """Dispatch a captured hotkey action onto the Tkinter event loop.
+
+        :param action: Action key to perform.
+        :type action: str
+        :return: Nothing.
+        :rtype: None
+        """
         self.after(0, self._handle_hotkey, action)
 
     def _handle_hotkey(self, action: str) -> None:
+        """Handle hotkey actions by invoking the matching command.
+
+        :param action: Action identifier from the hotkey map.
+        :type action: str
+        :return: Nothing.
+        :rtype: None
+        """
         if action == "start_record":
             self.start_recording()
         elif action == "stop_record":
@@ -129,12 +167,22 @@ class App(tk.Tk):
             self.load_macro()
 
     def start_recording(self) -> None:
+        """Begin recording input events and update control states.
+
+        :return: Nothing.
+        :rtype: None
+        """
         if self.recorder:
             self.start_rec_btn.configure(state="disabled")
             self.stop_rec_btn.configure(state="normal")
             self.recorder.start(list(self.hotkeys.values()))
 
     def stop_recording(self) -> None:
+        """Stop recording and populate preview with recorded events.
+
+        :return: Nothing.
+        :rtype: None
+        """
         self.start_rec_btn.configure(state="normal")
         self.stop_rec_btn.configure(state="disabled")
         events = self.recorder.stop()
@@ -145,6 +193,13 @@ class App(tk.Tk):
             self._populate_preview(None)
 
     def _populate_preview(self, macro: Optional[Macro]) -> None:
+        """Fill the preview tree with macro events.
+
+        :param macro: Macro to preview or ``None`` to clear.
+        :type macro: Macro | None
+        :return: Nothing.
+        :rtype: None
+        """
         for item in self.preview.get_children():
             self.preview.delete(item)
         if not macro:
@@ -155,6 +210,13 @@ class App(tk.Tk):
                                                    evt.delay_ms))
 
     def _delete_selected_events(self, _event: Optional[tk.Event] = None) -> None:
+        """Delete selected events from the current macro and update preview.
+
+        :param _event: Optional Tk event when triggered from key binding.
+        :type _event: tk.Event | None
+        :return: Nothing.
+        :rtype: None
+        """
         if not self.current_macro or self.current_macro.is_empty():
             self._log("No macro to edit")
             return
@@ -174,6 +236,11 @@ class App(tk.Tk):
         self._populate_preview(self.current_macro if not self.current_macro.is_empty() else None)
 
     def start_playback(self) -> None:
+        """Start macro playback with the configured repeat count.
+
+        :return: Nothing.
+        :rtype: None
+        """
         if not self.current_macro or self.current_macro.is_empty():
             messagebox.showwarning("Macro", "No macro loaded")
             return
@@ -190,11 +257,21 @@ class App(tk.Tk):
         self.player.play(self.current_macro, repeats)
 
     def stop_playback(self) -> None:
+        """Stop macro playback and restore control states.
+
+        :return: Nothing.
+        :rtype: None
+        """
         self.player.stop()
         self.start_play_btn.configure(state="normal")
         self.stop_play_btn.configure(state="disabled")
 
     def save_macro(self) -> None:
+        """Prompt for a file name and persist the current macro to CSV.
+
+        :return: Nothing.
+        :rtype: None
+        """
         if not self.current_macro or self.current_macro.is_empty():
             messagebox.showwarning("Save", "No macro to save")
             return
@@ -211,6 +288,11 @@ class App(tk.Tk):
         self._log(f"Macro '{name}' saved to {path_str}")
 
     def load_macro(self) -> None:
+        """Load a macro from CSV and update preview and current state.
+
+        :return: Nothing.
+        :rtype: None
+        """
         path_str = filedialog.askopenfilename(filetypes=[("CSV", "*.csv")], title="Load macro")
         if not path_str:
             return
@@ -235,6 +317,13 @@ class App(tk.Tk):
         self._log(f"Macro '{macro.name}' loaded")
 
     def _start_hotkey_capture(self, action: str) -> None:
+        """Start capturing a new hotkey combination for a specific action.
+
+        :param action: Action identifier being rebound.
+        :type action: str
+        :return: Nothing.
+        :rtype: None
+        """
         self._log(f"Capturing hotkey for {action}...")
         self.hotkey_manager.stop()
 
@@ -245,6 +334,15 @@ class App(tk.Tk):
         threading.Thread(target=worker, daemon=True).start()
 
     def _finish_capture(self, action: str, combo: Optional[List[str]]) -> None:
+        """Finalize hotkey capture, persist configuration, and restart listener.
+
+        :param action: Action identifier being updated.
+        :type action: str
+        :param combo: Captured key combination or ``None`` if invalid.
+        :type combo: list[str] | None
+        :return: Nothing.
+        :rtype: None
+        """
         if not combo or len(combo) < 2:
             self._log("Hotkey ignored (minimum 2 keys)")
         else:
@@ -257,6 +355,11 @@ class App(tk.Tk):
 
 
 def main() -> None:
+    """Run the application in standalone mode.
+
+    :return: Nothing.
+    :rtype: None
+    """
     app = App()
     app.mainloop()
 

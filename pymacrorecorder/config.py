@@ -25,12 +25,22 @@ DEFAULT_HOTKEYS: Dict[str, List[str]] = {
 
 
 def _config_path() -> Path:
+    """Return the filesystem path to the user config file, creating the directory.
+
+    :return: Absolute path to the config file.
+    :rtype: pathlib.Path
+    """
     data_dir = Path(user_data_dir(APP_NAME, APP_AUTHOR))
     data_dir.mkdir(parents=True, exist_ok=True)
     return data_dir / CONFIG_NAME
 
 
 def load_config() -> Dict[str, Dict[str, List[str]]]:
+    """Load hotkey configuration, falling back to defaults on error or absence.
+
+    :return: Mapping containing sanitized hotkey combinations.
+    :rtype: dict[str, dict[str, list[str]]]
+    """
     path = _config_path()
     if not path.exists():
         return {"hotkeys": DEFAULT_HOTKEYS.copy()}
@@ -54,6 +64,13 @@ def load_config() -> Dict[str, Dict[str, List[str]]]:
 
 
 def save_config(config: Dict[str, Dict[str, List[str]]]) -> None:
+    """Persist the provided configuration to disk.
+
+    :param config: Configuration payload containing hotkey mappings.
+    :type config: dict[str, dict[str, list[str]]]
+    :return: Nothing.
+    :rtype: None
+    """
     path = _config_path()
     hotkeys = config.get("hotkeys", DEFAULT_HOTKEYS)
     normalized = {k: normalize_combo(v) for k, v in hotkeys.items()}

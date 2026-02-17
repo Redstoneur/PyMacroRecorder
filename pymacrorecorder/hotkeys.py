@@ -13,28 +13,61 @@ HotkeyCallback = Callable[[str], None]
 
 
 class HotkeyManager:
+    """Manage global hotkey registration and dispatch via pynput."""
+
     def __init__(self, mapping: Dict[str, List[str]], dispatcher: HotkeyCallback):
+        """Create a hotkey manager with an action-to-combo mapping.
+
+        :param mapping: Hotkey mapping keyed by action name.
+        :type mapping: dict[str, list[str]]
+        :param dispatcher: Callback invoked with action identifier when triggered.
+        :type dispatcher: Callable[[str], None]
+        :return: Nothing.
+        :rtype: None
+        """
         self.mapping = mapping
         self.dispatcher = dispatcher
         self._listener: Optional[keyboard.GlobalHotKeys] = None
         self._lock = threading.Lock()
 
     def start(self) -> None:
+        """Start the hotkey listener with the current mapping.
+
+        :return: Nothing.
+        :rtype: None
+        """
         with self._lock:
             self._restart()
 
     def stop(self) -> None:
+        """Stop the hotkey listener if it is running.
+
+        :return: Nothing.
+        :rtype: None
+        """
         with self._lock:
             if self._listener:
                 self._listener.stop()
                 self._listener = None
 
     def update(self, mapping: Dict[str, List[str]]) -> None:
+        """Replace the mapping and restart the listener safely.
+
+        :param mapping: New hotkey mapping keyed by action name.
+        :type mapping: dict[str, list[str]]
+        :return: Nothing.
+        :rtype: None
+        """
         with self._lock:
             self.mapping = mapping
             self._restart()
 
     def _restart(self) -> None:
+        """Rebuild the pynput listener according to the current mapping.
+
+        :return: Nothing.
+        :rtype: None
+        """
         if self._listener:
             self._listener.stop()
         hotkey_map: Dict[str, Callable[[], None]] = {}
@@ -54,6 +87,15 @@ class HotkeyManager:
 
 
 def capture_hotkey_blocking(min_keys: int = 2, timeout: int = 10) -> Optional[List[str]]:
+    """Capture a hotkey combination synchronously using pynput listeners.
+
+    :param min_keys: Minimum number of keys required to accept the combo.
+    :type min_keys: int
+    :param timeout: Maximum seconds to wait before aborting capture.
+    :type timeout: int
+    :return: Normalized combo if enough keys were pressed, else ``None``.
+    :rtype: list[str] | None
+    """
     combo: List[str] = []
     done = threading.Event()
 
