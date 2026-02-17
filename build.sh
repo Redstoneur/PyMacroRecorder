@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 # Build PyMacroRecorder standalone binary using pyinstaller (Linux/macOS)
@@ -15,8 +15,16 @@ APP_NAME="PyMacroRecorder"
 rm -rf "$DIST_DIR" "$BUILD_DIR" "$SPEC_FILE"
 
 # Run pyinstaller with icon and assets
-pyinstaller --onefile --noconsole --name "$APP_NAME" --icon "$ICON_FILE" --add-data "assets:assets" --distpath "$DIST_DIR" --workpath "$BUILD_DIR" "$ENTRYPOINT"
+# Add hidden imports for pynput Linux backends
+pyinstaller --onefile --noconsole \
+  --name "$APP_NAME" \
+  --icon "$ICON_FILE" \
+  --add-data "assets:assets" \
+  --hidden-import pynput.keyboard._xorg \
+  --hidden-import pynput.mouse._xorg \
+  --distpath "$DIST_DIR" \
+  --workpath "$BUILD_DIR" \
+  "$ENTRYPOINT"
 
 # Print result path
 echo "Build complete. Binary located at: $DIST_DIR/$APP_NAME"
-
