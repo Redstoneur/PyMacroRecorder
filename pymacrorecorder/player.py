@@ -18,7 +18,11 @@ CompletionFn = Callable[[], None]
 class Player:
     """Replay recorded macro events using pynput controllers."""
 
-    def __init__(self, log_fn: Optional[LogFn] = None, on_completion: Optional[CompletionFn] = None) -> None:
+    def __init__(
+            self,
+            log_fn: Optional[LogFn] = None,
+            on_completion: Optional[CompletionFn] = None
+    ) -> None:
         """Initialize the player with optional logging hook.
 
         :param log_fn: Callback to log status messages.

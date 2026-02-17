@@ -4,7 +4,7 @@ import sys
 import threading
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, messagebox, simpledialog, ttk
+from tkinter import filedialog, messagebox, ttk
 from typing import Dict, List, Optional
 
 from .config import DEFAULT_HOTKEYS, load_config, save_config
