@@ -53,4 +53,3 @@ def load_macros_from_csv(path: Path) -> List[Macro]:
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
         return []
     return macros
-

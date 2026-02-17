@@ -16,7 +16,7 @@ from .storage import load_macros_from_csv, save_macro_to_csv
 from .utils import format_combo
 
 
-class App(tk.Tk):
+class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
     """Main Tkinter window that orchestrates recording, playback, and storage."""
 
     def __init__(self) -> None:
@@ -52,7 +52,7 @@ class App(tk.Tk):
             if getattr(sys, 'frozen', False):
                 # Running as compiled executable
                 # noinspection PyProtectedMember
-                base_path = Path(sys._MEIPASS)
+                base_path = Path(sys._MEIPASS)  # pylint: disable=protected-access
             else:
                 # Running as script
                 base_path = Path(__file__).parent.parent
@@ -66,7 +66,7 @@ class App(tk.Tk):
                 icon_ico_path = base_path / "assets" / "logo.ico"
                 if icon_ico_path.exists():
                     self.iconbitmap(str(icon_ico_path))
-        except Exception as e:
+        except (OSError, tk.TclError) as e:
             # Silently fail if icon cannot be loaded
             print(f"Warning: Could not load icon: {e}")
 

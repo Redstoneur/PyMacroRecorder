@@ -14,7 +14,7 @@ from .utils import button_to_str, key_to_str, pressed_matches_hotkey, combos_as_
 LogFn = Callable[[str], None]
 
 
-class Recorder:
+class Recorder:  # pylint: disable=too-many-instance-attributes
     """Capture keyboard and mouse events while respecting ignored hotkeys."""
 
     def __init__(self, log_fn: Optional[LogFn] = None) -> None:

@@ -86,7 +86,7 @@ def is_parseable_hotkey(combo_str: str) -> bool:
         return False
 
 
-def str_to_key(label: str) -> keyboard.Key | keyboard.KeyCode:
+def str_to_key(label: str) -> keyboard.Key | keyboard.KeyCode:  # pylint: disable=too-many-return-statements
     """Convert a normalized label to a pynput key instance.
 
     :param label: Normalized label such as ``a`` or ``<ctrl>``.
@@ -126,7 +126,7 @@ def str_to_button(label: str) -> mouse.Button:
     except KeyError:
         try:
             return mouse.Button(int(label))  # handle numeric value
-        except Exception:
+        except (ValueError, TypeError):
             return mouse.Button.left
 
 
