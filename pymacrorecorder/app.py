@@ -300,26 +300,28 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
     def save_macro(self) -> None:
         """Prompt for a file name and persist the current macro to CSV.
 
+        The macro name is derived from the filename.
+
         :return: Nothing.
         :rtype: None
         """
         if not self.current_macro or self.current_macro.is_empty():
             messagebox.showwarning("Save", "No macro to save")
             return
-        name = simpledialog.askstring("Name", "Macro name",
-                                      initialvalue=self.current_macro.name)
-        if not name:
-            return
-        self.current_macro.name = name
         path_str = filedialog.asksaveasfilename(defaultextension=".csv",
                                                 filetypes=[("CSV", "*.csv")], title="Save macro")
         if not path_str:
             return
-        save_macro_to_csv(Path(path_str), self.current_macro)
-        self._log(f"Macro '{name}' saved to {path_str}")
+        path = Path(path_str)
+        macro_name = path.stem
+        self.current_macro.name = macro_name
+        save_macro_to_csv(path, self.current_macro)
+        self._log(f"Macro '{macro_name}' saved to {path_str}")
 
     def load_macro(self) -> None:
         """Load a macro from CSV and update preview and current state.
+
+        The macro name is derived from the filename.
 
         :return: Nothing.
         :rtype: None
@@ -332,20 +334,9 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
             messagebox.showerror("Load", "No macro found")
             return
         macro = macros[0]
-        if len(macros) > 1:
-            names = [m.name for m in macros]
-            choice = simpledialog.askstring(
-                "Selection",
-                f"Available macros: {', '.join(names)}\nName to load:"
-            )
-            if choice:
-                for m in macros:
-                    if m.name == choice:
-                        macro = m
-                        break
         self.current_macro = macro
         self._populate_preview(macro)
-        self._log(f"Macro '{macro.name}' loaded")
+        self._log(f"Macro '{macro.name}' loaded from {path_str}")
 
     def _start_hotkey_capture(self, action: str) -> None:
         """Start capturing a new hotkey combination for a specific action.
