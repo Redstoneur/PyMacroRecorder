@@ -33,7 +33,7 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         cfg = load_config()
         self.hotkeys: Dict[str, List[str]] = cfg.get("hotkeys", DEFAULT_HOTKEYS)
         self.recorder = Recorder(self._log)
-        self.player = Player(self._log)
+        self.player = Player(self._log, on_completion=self._on_playback_complete)
         self.current_macro: Optional[Macro] = None
 
         self._build_ui()
@@ -374,6 +374,16 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
             self._refresh_hotkey_labels()
             self._log(f"Hotkey '{action}' updated: {format_combo(combo)}")
         self.hotkey_manager.start()
+
+    def _on_playback_complete(self) -> None:
+        """Called when playback finishes naturally (from worker thread).
+
+        Dispatches UI update to main thread.
+
+        :return: Nothing.
+        :rtype: None
+        """
+        self.after(0, self.stop_playback)
 
 
 def main() -> None:

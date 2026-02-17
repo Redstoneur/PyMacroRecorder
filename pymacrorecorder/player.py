@@ -12,20 +12,24 @@ from .models import Macro
 from .utils import str_to_button, str_to_key
 
 LogFn = Callable[[str], None]
+CompletionFn = Callable[[], None]
 
 
 class Player:
     """Replay recorded macro events using pynput controllers."""
 
-    def __init__(self, log_fn: Optional[LogFn] = None) -> None:
+    def __init__(self, log_fn: Optional[LogFn] = None, on_completion: Optional[CompletionFn] = None) -> None:
         """Initialize the player with optional logging hook.
 
         :param log_fn: Callback to log status messages.
         :type log_fn: Callable[[str], None] | None
+        :param on_completion: Callback when playback completes naturally.
+        :type on_completion: Callable[[], None] | None
         :return: Nothing.
         :rtype: None
         """
         self.log = log_fn or (lambda _: None)
+        self.on_completion = on_completion or (lambda: None)
         self._keyboard = keyboard.Controller()
         self._mouse = mouse.Controller()
         self._thread: Optional[threading.Thread] = None
@@ -85,6 +89,10 @@ class Player:
                 time.sleep(max(event.delay_ms / 1000.0, 0))
                 self._apply_event(event)
             count += 1
+        # Only call completion callback if not stopped manually
+        if not self._stop_event.is_set():
+            self.log("Playback completed")
+            self.on_completion()
         self._stop_event.clear()
 
     def _apply_event(self, event) -> None:
