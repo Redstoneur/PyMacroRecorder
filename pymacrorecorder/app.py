@@ -56,7 +56,6 @@ class App(tk.Tk):
             else:
                 # Running as script
                 base_path = Path(__file__).parent.parent
-                print(base_path)
 
             icon_path = base_path / "assets" / "logo.png"
             if icon_path.exists():
