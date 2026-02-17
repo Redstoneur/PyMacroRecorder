@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List
 
@@ -47,7 +48,7 @@ def load_config() -> Dict[str, Dict[str, List[str]]]:
     try:
         with path.open("r", encoding="utf-8") as fh:
             data = json.load(fh)
-    except Exception:
+    except (OSError, JSONDecodeError):
         return {"hotkeys": DEFAULT_HOTKEYS.copy()}
     hotkeys = data.get("hotkeys", {})
     merged = DEFAULT_HOTKEYS.copy()

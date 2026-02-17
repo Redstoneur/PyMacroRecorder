@@ -42,6 +42,4 @@ class Macro:
         :return: ``True`` if no events are stored.
         :rtype: bool
         """
-
         return len(self.events) == 0
-

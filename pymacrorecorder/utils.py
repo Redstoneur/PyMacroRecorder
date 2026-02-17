@@ -82,7 +82,7 @@ def is_parseable_hotkey(combo_str: str) -> bool:
     try:
         keyboard.HotKey.parse(combo_str)
         return True
-    except Exception:
+    except (ValueError, KeyError):
         return False
 
 

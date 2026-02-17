@@ -43,11 +43,14 @@ def load_macros_from_csv(path: Path) -> List[Macro]:
     macros: List[Macro] = []
     if not path.exists():
         return macros
-    with path.open("r", newline="", encoding="utf-8") as fh:
-        reader = csv.DictReader(fh)
-        for row in reader:
-            raw_events = json.loads(row.get("events", "[]"))
-            events = [MacroEvent(**evt) for evt in raw_events]
-            macros.append(Macro(name=row.get("name", "macro"), events=events))
+    try:
+        with path.open("r", newline="", encoding="utf-8") as fh:
+            reader = csv.DictReader(fh)
+            for row in reader:
+                raw_events = json.loads(row.get("events", "[]"))
+                events = [MacroEvent(**evt) for evt in raw_events]
+                macros.append(Macro(name=row.get("name", "macro"), events=events))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        return []
     return macros
 
