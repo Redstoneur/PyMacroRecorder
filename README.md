@@ -4,7 +4,7 @@
 
 ![License](https://img.shields.io/github/license/Redstoneur/PyMacroRecorder)
 ![Top Language](https://img.shields.io/github/languages/top/Redstoneur/PyMacroRecorder)
-![Python Version](https://img.shields.io/badge/python-3.14.0-blue)
+![Python Version](https://img.shields.io/badge/python-%3E%3D3.10-blue)
 ![Size](https://img.shields.io/github/repo-size/Redstoneur/PyMacroRecorder)
 ![Contributors](https://img.shields.io/github/contributors/Redstoneur/PyMacroRecorder)
 ![Last Commit](https://img.shields.io/github/last-commit/Redstoneur/PyMacroRecorder)
