@@ -36,6 +36,20 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.player = Player(self._log, on_completion=self._on_playback_complete)
         self.current_macro: Optional[Macro] = None
 
+        # Initialize UI attributes
+        self.start_rec_btn: ttk.Button = None  # type: ignore
+        self.stop_rec_btn: ttk.Button = None  # type: ignore
+        self.start_play_btn: ttk.Button = None  # type: ignore
+        self.stop_play_btn: ttk.Button = None  # type: ignore
+        self.save_btn: ttk.Button = None  # type: ignore
+        self.load_btn: ttk.Button = None  # type: ignore
+        self.delete_btn: ttk.Button = None  # type: ignore
+        self.repeat_var: tk.StringVar = None  # type: ignore
+        self.repeat_entry: ttk.Entry = None  # type: ignore
+        self.preview: ttk.Treeview = None  # type: ignore
+        self.log_text: tk.Text = None  # type: ignore
+        self.hotkey_labels: Dict[str, tk.Label] = {}
+
         self._build_ui()
         self._refresh_hotkey_labels()
         self.hotkey_manager = HotkeyManager(self.hotkeys, self._dispatch_hotkey)
@@ -161,7 +175,6 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         """
         hotkey_frame = ttk.LabelFrame(self, text="Hotkeys")
         hotkey_frame.pack(fill="x", padx=10, pady=5)
-        self.hotkey_labels: Dict[str, tk.Label] = {}
         row = 0
         for action, label in [
             ("start_record", "Start Record"),
