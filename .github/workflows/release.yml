@@ -55,17 +55,25 @@ jobs:
     name: Publish Release
     runs-on: ubuntu-latest
     needs: build
+    timeout-minutes: 15
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
 
-      - name: Create GitHub Release
+      - name: Upload Linux binary
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/**/PyMacroRecorder
-            artifacts/**/PyMacroRecorder.exe
+          files: artifacts/**/PyMacroRecorder-Linux
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Upload Windows binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/PyMacroRecorder-Windows.exe
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
