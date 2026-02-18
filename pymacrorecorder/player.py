@@ -114,7 +114,8 @@ class Player:
             "mouse_scroll": self._handle_mouse_scroll,
             "mouse_move": self._handle_mouse_move,
         }
-        handler = handlers.get(event.event_type)
+        handler: Callable[..., None] | Callable[..., None] | Callable[..., None] | Callable[
+            ..., None] | Callable[..., None] | None = handlers.get(event.event_type)
         if handler:
             handler(event.payload)
 
