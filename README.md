@@ -29,6 +29,7 @@
 Tkinter app to record, play, and save keyboard/mouse macros.
 
 ## Features
+
 - Global recording (pynput) with live log.
 - Buttons: Start/Stop Record, Start/Stop Macro, Save Macro, Load Macro.
 - Configurable global hotkeys (minimum 2 keys). Control combos are ignored during recording.
@@ -36,6 +37,7 @@ Tkinter app to record, play, and save keyboard/mouse macros.
 - Playback with repeat count (0 = infinite) and immediate stop.
 
 ## Structure
+
 ```
 PyMacroRecorder/
 ├─ main.py
@@ -64,6 +66,7 @@ PyMacroRecorder/
 ```
 
 ## Quick start
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: `.venv\Scripts\activate`
@@ -72,10 +75,12 @@ python main.py
 ```
 
 ## Save & config
+
 - Macros: CSV chosen via the UI (columns `name`, `events`).
 - Hotkeys: `config.json` in the user data directory (see `pymacrorecorder/config.py`).
 
 ## Default hotkeys
+
 - Start Record: Ctrl+Alt+R
 - Stop Record: Ctrl+Alt+S
 - Start Macro: Ctrl+Alt+P
