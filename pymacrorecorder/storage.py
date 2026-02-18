@@ -9,11 +9,13 @@ from typing import List
 
 from .models import Macro, MacroEvent
 
-CSV_FIELDS = ["name", "events"]
+CSV_FIELDS = ["id", "event_type", "payload", "delay_ms"]
 
 
 def save_macro_to_csv(path: Path, macro: Macro) -> None:
-    """Write a macro to CSV with JSON-encoded events.
+    """Write a macro to CSV with one event per line.
+
+    The macro name is derived from the filename (without extension).
 
     :param path: Destination CSV path.
     :type path: pathlib.Path
@@ -26,30 +28,42 @@ def save_macro_to_csv(path: Path, macro: Macro) -> None:
     with path.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=CSV_FIELDS)
         writer.writeheader()
-        writer.writerow({
-            "name": macro.name,
-            "events": json.dumps([event.__dict__ for event in macro.events]),
-        })
+        for idx, event in enumerate(macro.events, start=1):
+            writer.writerow({
+                "id": idx,
+                "event_type": event.event_type,
+                "payload": json.dumps(event.payload),
+                "delay_ms": event.delay_ms,
+            })
 
 
 def load_macros_from_csv(path: Path) -> List[Macro]:
-    """Load macros from a CSV file.
+    """Load a macro from a CSV file.
+
+    The macro name is derived from the filename (without extension).
 
     :param path: Source CSV path.
     :type path: pathlib.Path
-    :return: Parsed macros in file order.
+    :return: Parsed macro as a single-item list, or empty list if file not found.
     :rtype: list[Macro]
     """
     macros: List[Macro] = []
     if not path.exists():
         return macros
     try:
+        macro_name = path.stem
+        events: List[MacroEvent] = []
         with path.open("r", newline="", encoding="utf-8") as fh:
             reader = csv.DictReader(fh)
             for row in reader:
-                raw_events = json.loads(row.get("events", "[]"))
-                events = [MacroEvent(**evt) for evt in raw_events]
-                macros.append(Macro(name=row.get("name", "macro"), events=events))
+                raw_payload = json.loads(row.get("payload", "{}"))
+                event = MacroEvent(
+                    event_type=row.get("event_type", ""),
+                    payload=raw_payload,
+                    delay_ms=int(row.get("delay_ms", 0)),
+                )
+                events.append(event)
+        macros.append(Macro(name=macro_name, events=events))
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
         return []
     return macros
