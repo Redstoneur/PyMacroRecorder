@@ -1,6 +1,5 @@
-"""Fixtures et fakes pour tests headless (pynput simulé)."""
-
-# pylint: disable=too-few-public-methods,missing-function-docstring,invalid-name
+"""Fixtures and fakes for headless tests (simulated pynput)."""
+# pylint: disable=too-few-public-methods
 
 import sys
 import types
@@ -13,59 +12,77 @@ class _FakeWidget:
         self._state = None
 
     def pack(self, *_args, **_kwargs) -> None:
+        """Simulates pack geometry manager."""
         return None
 
     def grid(self, *_args, **_kwargs) -> None:
+        """Simulates grid geometry manager."""
         return None
 
     def bind(self, *_args, **_kwargs) -> None:
+        """Simulates event binding."""
         return None
 
     def configure(self, **kwargs) -> None:
+        """Simulates widget configuration."""
         self._state = kwargs.get("state", self._state)
 
     def insert(self, *_args, **_kwargs) -> None:
+        """Simulates inserting content."""
         return None
 
     def see(self, *_args, **_kwargs) -> None:
+        """Simulates scrolling to view."""
         return None
 
     def column(self, *_args, **_kwargs) -> None:
+        """Simulates column configuration."""
         return None
 
     def heading(self, *_args, **_kwargs) -> None:
+        """Simulates heading configuration."""
         return None
 
     def delete(self, *_args, **_kwargs) -> None:
+        """Simulates deletion of items."""
         return None
 
     def get_children(self) -> list:
+        """Returns fake children list."""
         return []
 
     def selection(self) -> list:
+        """Returns fake selection."""
         return []
 
     def index(self, _item) -> int:
+        """Returns fake item index."""
         return 0
 
 
 class _FakeTk(_FakeWidget):
     def after(self, *_args, **_kwargs) -> None:
+        """Simulates after scheduling."""
         return None
 
     def mainloop(self) -> None:
+        """Simulates tkinter mainloop."""
         return None
 
     def title(self, *_args) -> None:
+        """Simulates window title."""
         return None
 
     def geometry(self, *_args) -> None:
+        """Simulates window geometry."""
         return None
 
     def iconphoto(self, *_args, **_kwargs) -> None:
+        """Simulates icon photo."""
         return None
 
     def iconbitmap(self, *_args, **_kwargs) -> None:
+        """Simulates icon bitmap."""
         return None
 
 
@@ -74,9 +91,11 @@ class _FakeStringVar:
         self._value = value
 
     def get(self) -> str:
+        """Returns the stored string value."""
         return self._value
 
     def set(self, value: str) -> None:
+        """Sets the string value."""
         self._value = value
 
 
@@ -90,7 +109,7 @@ class _FakeEvent:
 
 
 def _setup_fake_tkinter_modules():
-    """Configure les faux modules tkinter pour les tests headless."""
+    """Configures fake tkinter modules for headless tests."""
     _fake_ttk = types.SimpleNamespace(
         Frame=_FakeWidget,
         LabelFrame=_FakeWidget,
@@ -125,9 +144,9 @@ def _setup_fake_tkinter_modules():
 
 
 def _check_tkinter_available():
-    """Vérifie si tkinter est disponible et configure les fakes si nécessaire."""
+    """Checks if tkinter is available and configures fakes if necessary."""
     try:
-        import tkinter as _tkinter
+        import tkinter as _tkinter  # pylint: disable=import-outside-toplevel
         del _tkinter
     except (ImportError, ModuleNotFoundError):
         _setup_fake_tkinter_modules()
@@ -165,16 +184,19 @@ class _FakeKeyCode:
 
     @classmethod
     def from_char(cls, char: str):
+        """Creates a fake key code from character."""
         return cls(char=char, vk=None)
 
     @classmethod
     def from_vk(cls, vk: int):
+        """Creates a fake key code from virtual key."""
         return cls(char=None, vk=vk)
 
 
 class _FakeHotKey:
     @staticmethod
     def parse(combo_str: str) -> None:
+        """Parses and validates a hotkey combination string."""
         if not combo_str or "+" not in combo_str:
             raise ValueError("Invalid hotkey")
         for part in combo_str.split("+"):
@@ -190,12 +212,15 @@ class _BaseListener:
         self.started = False
 
     def start(self) -> None:
+        """Simulates listener start."""
         self.started = True
 
     def stop(self) -> None:
+        """Simulates listener stop."""
         self.started = False
 
     def join(self) -> None:
+        """Simulates joining the listener thread."""
         return None
 
 
@@ -205,9 +230,11 @@ class _FakeGlobalHotKeys:
         self.started = False
 
     def start(self) -> None:
+        """Simulates global hotkeys listener start."""
         self.started = True
 
     def stop(self) -> None:
+        """Simulates global hotkeys listener stop."""
         self.started = False
 
 
@@ -217,15 +244,17 @@ class _FakeKeyboardController:
         self.released = []
 
     def press(self, key) -> None:
+        """Simulates key press."""
         self.pressed.append(key)
 
     def release(self, key) -> None:
+        """Simulates key release."""
         self.released.append(key)
 
 
 class _FakeMouseButton(Enum):
-    left = 1
-    right = 2
+    left = 1  # pylint: disable=invalid-name
+    right = 2  # pylint: disable=invalid-name
 
 
 class _FakeMouseController:
@@ -236,12 +265,15 @@ class _FakeMouseController:
         self.scrolled = []
 
     def press(self, button) -> None:
+        """Simulates mouse button press."""
         self.pressed.append(button)
 
     def release(self, button) -> None:
+        """Simulates mouse button release."""
         self.released.append(button)
 
     def scroll(self, dx: int, dy: int) -> None:
+        """Simulates mouse scroll."""
         self.scrolled.append((dx, dy))
 
 

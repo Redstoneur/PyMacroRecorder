@@ -1,4 +1,4 @@
-"""Tests de persistance CSV des macros."""
+"""Macro CSV persistence tests."""
 
 from pathlib import Path
 
@@ -8,7 +8,7 @@ from pymacrorecorder.storage import load_macros_from_csv, save_macro_to_csv
 
 
 def test_save_and_load_macro(tmp_path: Path) -> None:
-    """Sauvegarde puis recharge une macro CSV."""
+    """Saves then reloads a CSV macro."""
     macro = Macro(
         name="demo",
         events=[
@@ -30,14 +30,14 @@ def test_save_and_load_macro(tmp_path: Path) -> None:
 
 
 def test_load_macro_missing_file(tmp_path: Path) -> None:
-    """Retourne une liste vide si le fichier manque."""
+    """Returns an empty list if the file is missing."""
     missing = tmp_path / "missing.csv"
     assert not load_macros_from_csv(missing)
 
 
 
 def test_load_macro_invalid_payload(tmp_path: Path) -> None:
-    """Retourne une liste vide si le CSV est invalide."""
+    """Returns an empty list if the CSV is invalid."""
     path = tmp_path / "broken.csv"
     path.write_text(
         "id,event_type,payload,delay_ms\n1,key_down,{,0\n",

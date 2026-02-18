@@ -1,6 +1,6 @@
-"""Tests du gestionnaire de hotkeys."""
-
-# pylint: disable=protected-access,missing-class-docstring,missing-function-docstring,too-few-public-methods
+"""Hotkey manager tests."""
+# pylint: disable=too-few-public-methods
+# pylint: disable=protected-access
 
 from types import SimpleNamespace
 
@@ -9,7 +9,7 @@ from pymacrorecorder.hotkeys import HotkeyManager, capture_hotkey_blocking
 
 
 def test_hotkey_manager_filters_and_starts() -> None:
-    """Valide le filtrage des combos et l'execution du dispatcher."""
+    """Validates combo filtering and dispatcher execution."""
     dispatched = []
     manager = HotkeyManager(
         mapping={
@@ -28,7 +28,7 @@ def test_hotkey_manager_filters_and_starts() -> None:
 
 
 def test_hotkey_manager_update_to_empty() -> None:
-    """Ne demarre pas de listener quand la map est vide."""
+    """Does not start listener when the map is empty."""
     manager = HotkeyManager(mapping={}, dispatcher=lambda _a: None)
 
     manager.start()
@@ -37,7 +37,7 @@ def test_hotkey_manager_update_to_empty() -> None:
 
 
 def test_hotkey_manager_stop_clears_listener() -> None:
-    """Arrete le listener et le remet a None."""
+    """Stops the listener and sets it back to None."""
     manager = HotkeyManager(mapping={"start": ["<ctrl>", "r"]}, dispatcher=lambda _a: None)
 
     manager.start()
@@ -49,7 +49,7 @@ def test_hotkey_manager_stop_clears_listener() -> None:
 
 
 def test_hotkey_manager_update_restarts_listener() -> None:
-    """Redemarre avec une nouvelle map valide."""
+    """Restarts with a new valid map."""
     manager = HotkeyManager(mapping={"start": ["<ctrl>", "r"]}, dispatcher=lambda _a: None)
 
     manager.start()
@@ -62,31 +62,41 @@ def test_hotkey_manager_update_restarts_listener() -> None:
 
 
 def test_capture_hotkey_blocking_returns_combo(monkeypatch) -> None:
-    """Capture une combinaison valide et la normalise."""
+    """Captures a valid combination and normalizes it."""
+
     class FakeEvent:
+        """Fake threading event for testing."""
+
         def __init__(self) -> None:
             self._set = False
 
         def set(self) -> None:
+            """Sets the event flag."""
             self._set = True
 
         def wait(self, _timeout: int | None = None, **_kwargs) -> bool:
+            """Waits for the event."""
             return True
 
     class FakeListener:
+        """Fake keyboard listener for testing."""
+
         def __init__(self, on_press, on_release) -> None:
             self._on_press = on_press
             self._on_release = on_release
 
         def start(self) -> None:
+            """Starts the listener and simulates key events."""
             self._on_press(hotkeys_module.keyboard.Key.ctrl)
             self._on_press(hotkeys_module.keyboard.KeyCode.from_char("r"))
             self._on_release(hotkeys_module.keyboard.KeyCode.from_char("r"))
 
         def stop(self) -> None:
+            """Stops the listener."""
             return None
 
         def join(self) -> None:
+            """Joins the listener thread."""
             return None
 
     monkeypatch.setattr(hotkeys_module, "threading", SimpleNamespace(Event=FakeEvent))
@@ -98,24 +108,33 @@ def test_capture_hotkey_blocking_returns_combo(monkeypatch) -> None:
 
 
 def test_capture_hotkey_blocking_returns_none_when_too_short(monkeypatch) -> None:
-    """Retourne None si la combinaison est trop courte."""
+    """Returns None if the combination is too short."""
+
     class FakeEvent:
+        """Fake threading event for testing."""
+
         def wait(self, _timeout: int | None = None, **_kwargs) -> bool:
+            """Waits for the event."""
             return True
 
     class FakeListener:
+        """Fake keyboard listener for testing."""
+
         def __init__(self, on_press, on_release) -> None:
             self._on_press = on_press
             self._on_release = on_release
 
         def start(self) -> None:
+            """Starts the listener and simulates key events."""
             self._on_press(hotkeys_module.keyboard.KeyCode.from_char("x"))
             self._on_release(hotkeys_module.keyboard.KeyCode.from_char("x"))
 
         def stop(self) -> None:
+            """Stops the listener."""
             return None
 
         def join(self) -> None:
+            """Joins the listener thread."""
             return None
 
     monkeypatch.setattr(hotkeys_module, "threading", SimpleNamespace(Event=FakeEvent))

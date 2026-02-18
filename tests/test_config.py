@@ -1,4 +1,4 @@
-"""Tests de configuration (load/save)."""
+"""Configuration tests (load/save)."""
 
 import json
 from pathlib import Path
@@ -8,7 +8,7 @@ from pymacrorecorder import config
 
 
 def test_load_config_defaults_when_missing(monkeypatch, tmp_path: Path) -> None:
-    """Retourne les valeurs par defaut si le fichier manque."""
+    """Returns default values if the file is missing."""
     cfg_path = tmp_path / "config.json"
     monkeypatch.setattr(config, "_config_path", lambda: cfg_path)
 
@@ -19,7 +19,7 @@ def test_load_config_defaults_when_missing(monkeypatch, tmp_path: Path) -> None:
 
 
 def test_load_config_invalid_json(monkeypatch, tmp_path: Path) -> None:
-    """Retourne les valeurs par defaut si le JSON est invalide."""
+    """Returns default values if the JSON is invalid."""
     cfg_path = tmp_path / "config.json"
     cfg_path.write_text("{broken", encoding="utf-8")
     monkeypatch.setattr(config, "_config_path", lambda: cfg_path)
@@ -31,7 +31,7 @@ def test_load_config_invalid_json(monkeypatch, tmp_path: Path) -> None:
 
 
 def test_load_config_sanitizes_hotkeys(monkeypatch, tmp_path: Path) -> None:
-    """Normalise et valide les hotkeys lues du fichier."""
+    """Normalizes and validates hotkeys read from the file."""
     cfg_path = tmp_path / "config.json"
     payload = {
         "hotkeys": {
@@ -52,7 +52,7 @@ def test_load_config_sanitizes_hotkeys(monkeypatch, tmp_path: Path) -> None:
 
 
 def test_save_config_normalizes(monkeypatch, tmp_path: Path) -> None:
-    """Normalise avant ecriture sur disque."""
+    """Normalizes before writing to disk."""
     cfg_path = tmp_path / "config.json"
     monkeypatch.setattr(config, "_config_path", lambda: cfg_path)
 

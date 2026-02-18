@@ -1,5 +1,4 @@
-"""Tests du recorder (sans UI)."""
-
+"""Recorder tests (without UI)."""
 # pylint: disable=protected-access
 
 import itertools
@@ -11,7 +10,7 @@ from pymacrorecorder.recorder import Recorder
 
 
 def test_recorder_records_events_with_delay(monkeypatch) -> None:
-    """Enregistre les evenements avec delai calcule."""
+    """Records events with calculated delay."""
     times = itertools.chain([100.0, 100.1, 100.3], itertools.repeat(100.3))
     monkeypatch.setattr("pymacrorecorder.recorder.time.time", lambda: next(times))
 
@@ -33,14 +32,14 @@ def test_recorder_records_events_with_delay(monkeypatch) -> None:
 
 
 def test_recorder_stop_without_start() -> None:
-    """Retourne une liste vide si on arrete sans demarrer."""
+    """Returns an empty list if stopped without starting."""
     recorder = Recorder()
     assert not recorder.stop()
 
 
 
 def test_recorder_ignores_when_hotkey_pressed() -> None:
-    """Ignore les evenements pendant une hotkey a ignorer."""
+    """Ignores events during a hotkey to ignore."""
     recorder = Recorder()
     recorder.start(ignored_hotkeys=[["<ctrl>", "r"]])
 
@@ -55,7 +54,7 @@ def test_recorder_ignores_when_hotkey_pressed() -> None:
 
 
 def test_recorder_scroll_and_move_events(monkeypatch) -> None:
-    """Enregistre les evenements de scroll et de move."""
+    """Records scroll and move events."""
     monkeypatch.setattr("pymacrorecorder.recorder.time.time", lambda: 100.0)
     recorder = Recorder()
     recorder.start(ignored_hotkeys=[])
@@ -74,7 +73,7 @@ def test_recorder_scroll_and_move_events(monkeypatch) -> None:
 
 
 def test_recorder_ignores_release_when_hotkey_active() -> None:
-    """N'ajoute pas d'event key_up quand la hotkey est active."""
+    """Does not add key_up event when hotkey is active."""
     recorder = Recorder()
     recorder.start(ignored_hotkeys=[["<ctrl>", "r"]])
 
@@ -90,7 +89,7 @@ def test_recorder_ignores_release_when_hotkey_active() -> None:
 
 
 def test_recorder_no_events_when_not_running() -> None:
-    """Ne produit pas d'events si le recorder n'est pas demarre."""
+    """Does not produce events if the recorder is not started."""
     recorder = Recorder()
 
     recorder._on_move(1, 2)

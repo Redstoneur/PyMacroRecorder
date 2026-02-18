@@ -1,5 +1,4 @@
-"""Tests du lecteur de macros."""
-
+"""Macro player tests."""
 # pylint: disable=protected-access
 
 from pymacrorecorder.models import Macro, MacroEvent
@@ -7,7 +6,7 @@ from pymacrorecorder.player import Player
 
 
 def test_player_applies_events_and_completes(monkeypatch) -> None:
-    """Applique les evenements et appelle la completion."""
+    """Applies events and calls completion."""
     player = Player()
     completed = {"called": False}
     player.on_completion = lambda: completed.update({"called": True})
@@ -34,7 +33,7 @@ def test_player_applies_events_and_completes(monkeypatch) -> None:
 
 
 def test_player_stop_prevents_completion(monkeypatch) -> None:
-    """Ne declenche pas la completion si l'arret est demande."""
+    """Does not trigger completion if stop is requested."""
     player = Player()
     completed = {"called": False}
     player.on_completion = lambda: completed.update({"called": True})
