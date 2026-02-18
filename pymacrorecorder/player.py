@@ -107,18 +107,16 @@ class Player:
         :return: Nothing.
         :rtype: None
         """
-        handlers = {
+        handlers: dict[str, Callable[[dict], None]] = {
             "key_down": self._handle_key_down,
             "key_up": self._handle_key_up,
             "mouse_click": self._handle_mouse_click,
             "mouse_scroll": self._handle_mouse_scroll,
             "mouse_move": self._handle_mouse_move,
         }
-        handler: Callable[..., None] | Callable[..., None] | Callable[..., None] | Callable[
-            ..., None] | Callable[..., None] | None = handlers.get(event.event_type)
+        handler: Optional[Callable[[dict], None]] = handlers.get(event.event_type)
         if handler:
             handler(event.payload)
-
     def _handle_key_down(self, data: dict) -> None:
         """Handle key down event.
 
