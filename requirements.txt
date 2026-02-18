@@ -5,3 +5,4 @@ pyinstaller-hooks-contrib>=2026.0
 pylint>=2.15.0
 ruff>=0.0.241
 pytest>=7.2.0
+pytest-cov>=4.0.0
