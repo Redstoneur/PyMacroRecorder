@@ -7,86 +7,90 @@ import types
 from enum import Enum
 from pathlib import Path
 
-try:
-    import tkinter as _tkinter
-    del _tkinter
-except (ImportError, ModuleNotFoundError):
-    class _FakeWidget:
-        def __init__(self, *_args, **_kwargs) -> None:
-            self._state = None
 
-        def pack(self, *_args, **_kwargs) -> None:
-            return None
+class _FakeWidget:
+    def __init__(self, *_args, **_kwargs) -> None:
+        self._state = None
 
-        def grid(self, *_args, **_kwargs) -> None:
-            return None
+    def pack(self, *_args, **_kwargs) -> None:
+        return None
 
-        def bind(self, *_args, **_kwargs) -> None:
-            return None
+    def grid(self, *_args, **_kwargs) -> None:
+        return None
 
-        def configure(self, **kwargs) -> None:
-            self._state = kwargs.get("state", self._state)
+    def bind(self, *_args, **_kwargs) -> None:
+        return None
 
-        def insert(self, *_args, **_kwargs) -> None:
-            return None
+    def configure(self, **kwargs) -> None:
+        self._state = kwargs.get("state", self._state)
 
-        def see(self, *_args, **_kwargs) -> None:
-            return None
+    def insert(self, *_args, **_kwargs) -> None:
+        return None
 
-        def column(self, *_args, **_kwargs) -> None:
-            return None
+    def see(self, *_args, **_kwargs) -> None:
+        return None
 
-        def heading(self, *_args, **_kwargs) -> None:
-            return None
+    def column(self, *_args, **_kwargs) -> None:
+        return None
 
-        def delete(self, *_args, **_kwargs) -> None:
-            return None
+    def heading(self, *_args, **_kwargs) -> None:
+        return None
 
-        def get_children(self) -> list:
-            return []
+    def delete(self, *_args, **_kwargs) -> None:
+        return None
 
-        def selection(self) -> list:
-            return []
+    def get_children(self) -> list:
+        return []
 
-        def index(self, _item) -> int:
-            return 0
+    def selection(self) -> list:
+        return []
 
-    class _FakeTk(_FakeWidget):
-        def after(self, *_args, **_kwargs) -> None:
-            return None
+    def index(self, _item) -> int:
+        return 0
 
-        def mainloop(self) -> None:
-            return None
 
-        def title(self, *_args) -> None:
-            return None
+class _FakeTk(_FakeWidget):
+    def after(self, *_args, **_kwargs) -> None:
+        return None
 
-        def geometry(self, *_args) -> None:
-            return None
+    def mainloop(self) -> None:
+        return None
 
-        def iconphoto(self, *_args, **_kwargs) -> None:
-            return None
+    def title(self, *_args) -> None:
+        return None
 
-        def iconbitmap(self, *_args, **_kwargs) -> None:
-            return None
+    def geometry(self, *_args) -> None:
+        return None
 
-    class _FakeStringVar:
-        def __init__(self, value: str = "") -> None:
-            self._value = value
+    def iconphoto(self, *_args, **_kwargs) -> None:
+        return None
 
-        def get(self) -> str:
-            return self._value
+    def iconbitmap(self, *_args, **_kwargs) -> None:
+        return None
 
-        def set(self, value: str) -> None:
-            self._value = value
 
-    class _FakePhotoImage:
-        def __init__(self, **_kwargs) -> None:
-            return None
+class _FakeStringVar:
+    def __init__(self, value: str = "") -> None:
+        self._value = value
 
-    class _FakeEvent:
+    def get(self) -> str:
+        return self._value
+
+    def set(self, value: str) -> None:
+        self._value = value
+
+
+class _FakePhotoImage:
+    def __init__(self, **_kwargs) -> None:
         pass
 
+
+class _FakeEvent:
+    pass
+
+
+def _setup_fake_tkinter_modules():
+    """Configure les faux modules tkinter pour les tests headless."""
     _fake_ttk = types.SimpleNamespace(
         Frame=_FakeWidget,
         LabelFrame=_FakeWidget,
@@ -118,6 +122,19 @@ except (ImportError, ModuleNotFoundError):
     sys.modules.setdefault("tkinter.ttk", _fake_ttk)
     sys.modules.setdefault("tkinter.filedialog", _fake_filedialog)
     sys.modules.setdefault("tkinter.messagebox", _fake_messagebox)
+
+
+def _check_tkinter_available():
+    """Vérifie si tkinter est disponible et configure les fakes si nécessaire."""
+    try:
+        import tkinter as _tkinter
+        del _tkinter
+    except (ImportError, ModuleNotFoundError):
+        _setup_fake_tkinter_modules()
+
+
+_check_tkinter_available()
+
 
 class _FakeKey:
     def __init__(self, name: str) -> None:
