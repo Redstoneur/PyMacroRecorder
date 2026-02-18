@@ -76,6 +76,18 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         :return: Nothing.
         :rtype: None
         """
+        self._build_control_bar()
+        self._build_repeat_frame()
+        self._build_preview_tree()
+        self._build_log_area()
+        self._build_hotkey_editor()
+
+    def _build_control_bar(self) -> None:
+        """Build the control bar with recording, playback, and file buttons.
+
+        :return: Nothing.
+        :rtype: None
+        """
         controls = ttk.Frame(self)
         controls.pack(fill="x", padx=10, pady=5)
 
@@ -98,6 +110,12 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.load_btn.grid(row=0, column=5, padx=5, pady=2)
         self.delete_btn.grid(row=0, column=6, padx=5, pady=2)
 
+    def _build_repeat_frame(self) -> None:
+        """Build the repeat count input frame.
+
+        :return: Nothing.
+        :rtype: None
+        """
         repeat_frame = ttk.Frame(self)
         repeat_frame.pack(fill="x", padx=10, pady=2)
         ttk.Label(repeat_frame, text="Repeats (0 = infinite):").pack(side="left")
@@ -105,6 +123,12 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.repeat_entry = ttk.Entry(repeat_frame, textvariable=self.repeat_var, width=6)
         self.repeat_entry.pack(side="left", padx=5)
 
+    def _build_preview_tree(self) -> None:
+        """Build the event preview tree widget.
+
+        :return: Nothing.
+        :rtype: None
+        """
         preview_frame = ttk.LabelFrame(self, text="Event preview")
         preview_frame.pack(fill="both", expand=True, padx=10, pady=5)
         columns = ("#", "type", "details", "delay")
@@ -118,11 +142,23 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.preview.pack(fill="both", expand=True)
         self.preview.bind("<Delete>", lambda e: self._delete_selected_events())
 
+    def _build_log_area(self) -> None:
+        """Build the log text area.
+
+        :return: Nothing.
+        :rtype: None
+        """
         log_frame = ttk.LabelFrame(self, text="Log")
         log_frame.pack(fill="both", expand=True, padx=10, pady=5)
         self.log_text = tk.Text(log_frame, height=8, state="disabled")
         self.log_text.pack(fill="both", expand=True)
 
+    def _build_hotkey_editor(self) -> None:
+        """Build the hotkey configuration editor.
+
+        :return: Nothing.
+        :rtype: None
+        """
         hotkey_frame = ttk.LabelFrame(self, text="Hotkeys")
         hotkey_frame.pack(fill="x", padx=10, pady=5)
         self.hotkey_labels: Dict[str, tk.Label] = {}
