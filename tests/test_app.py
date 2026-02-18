@@ -1,4 +1,10 @@
-"""Headless tests for Tkinter app utilities."""
+"""Headless tests for Tkinter app utilities.
+
+This module contains comprehensive tests for the App class and its methods,
+using fake widgets and components to enable testing without a GUI.
+All tests verify app behavior including logging, hotkey handling, macro
+management, recording, playback, and file operations.
+"""
 # pylint: disable=too-few-public-methods
 # pylint: disable=protected-access
 
@@ -11,134 +17,290 @@ from pymacrorecorder.models import Macro, MacroEvent
 
 
 class FakeText:
-    """Fake text widget for testing."""
+    """Fake text widget for testing.
+
+    Simulates a Tkinter Text widget with state tracking and content storage.
+    """
 
     def __init__(self) -> None:
+        """Initializes the fake text widget.
+
+        Sets up internal state tracking and line storage.
+        """
         self.state = None
         self.lines = []
 
     def configure(self, **kwargs) -> None:
-        """Configures the text widget."""
+        """Configures the text widget.
+
+        :param kwargs: Configuration options, may include 'state'
+        :type kwargs: dict
+        :return: None
+        :rtype: None
+        """
         self.state = kwargs.get("state", self.state)
 
     def insert(self, _where: str, text: str) -> None:
-        """Inserts text into the widget."""
+        """Inserts text into the widget.
+
+        :param _where: Position to insert at (ignored)
+        :type _where: str
+        :param text: Text content to insert
+        :type text: str
+        :return: None
+        :rtype: None
+        """
         self.lines.append(text)
 
     def see(self, _where: str) -> None:
-        """Scrolls to view position."""
+        """Scrolls to view position.
+
+        :param _where: Position to scroll to (ignored)
+        :type _where: str
+        :return: None
+        :rtype: None
+        """
         return None
 
 
 class FakeLabel:
-    """Fake label widget for testing."""
+    """Fake label widget for testing.
+
+    Simulates a Tkinter Label widget with text tracking.
+    """
 
     def __init__(self) -> None:
+        """Initializes the fake label widget.
+
+        Sets up internal text storage.
+        """
         self.text = ""
 
     def configure(self, **kwargs) -> None:
-        """Configures the label widget."""
+        """Configures the label widget.
+
+        :param kwargs: Configuration options, may include 'text'
+        :type kwargs: dict
+        :return: None
+        :rtype: None
+        """
         self.text = kwargs.get("text", self.text)
 
 
 class FakeButton:
-    """Fake button widget for testing."""
+    """Fake button widget for testing.
+
+    Simulates a Tkinter Button widget with state tracking.
+    """
 
     def __init__(self) -> None:
+        """Initializes the fake button widget.
+
+        Sets up internal state storage.
+        """
         self.state = None
 
     def configure(self, **kwargs) -> None:
-        """Configures the button widget."""
+        """Configures the button widget.
+
+        :param kwargs: Configuration options, may include 'state'
+        :type kwargs: dict
+        :return: None
+        :rtype: None
+        """
         self.state = kwargs.get("state", self.state)
 
 
 class FakeTreeview:
-    """Fake treeview widget for testing."""
+    """Fake treeview widget for testing.
+
+    Simulates a Tkinter Treeview widget with item and selection management.
+    """
 
     def __init__(self) -> None:
+        """Initializes the fake treeview widget.
+
+        Sets up internal item and selection storage.
+        """
         self._items = []
         self._selection = []
 
     def get_children(self):
-        """Returns list of child item IDs."""
+        """Returns list of child item IDs.
+
+        :return: List of item IDs
+        :rtype: list
+        """
         return [item["id"] for item in self._items]
 
     def delete(self, item_id: str) -> None:
-        """Deletes an item from the treeview."""
+        """Deletes an item from the treeview.
+
+        :param item_id: ID of item to delete
+        :type item_id: str
+        :return: None
+        :rtype: None
+        """
         self._items = [item for item in self._items if item["id"] != item_id]
 
     def insert(self, _parent: str, _index: str, values):
-        """Inserts a new item into the treeview."""
+        """Inserts a new item into the treeview.
+
+        :param _parent: Parent item ID (ignored)
+        :type _parent: str
+        :param _index: Position index (ignored)
+        :type _index: str
+        :param values: Values for the new item
+        :return: ID of the inserted item
+        :rtype: str
+        """
         item_id = f"item{len(self._items)}"
         self._items.append({"id": item_id, "values": values})
         return item_id
 
     def selection(self):
-        """Returns the current selection."""
+        """Returns the current selection.
+
+        :return: List of selected item IDs
+        :rtype: list
+        """
         return list(self._selection)
 
     def set_selection(self, ids) -> None:
-        """Sets the current selection."""
+        """Sets the current selection.
+
+        :param ids: List of item IDs to select
+        :return: None
+        :rtype: None
+        """
         self._selection = list(ids)
 
     def index(self, item_id: str) -> int:
-        """Returns the index of the specified item."""
+        """Returns the index of the specified item.
+
+        :param item_id: ID of item to find
+        :type item_id: str
+        :return: Index of the item
+        :rtype: int
+        """
         return [item["id"] for item in self._items].index(item_id)
 
 
 class FakeRepeatVar:
-    """Fake StringVar for repeat count testing."""
+    """Fake StringVar for repeat count testing.
+
+    Simulates a StringVar that holds the repeat count value.
+    """
 
     def __init__(self, value: str) -> None:
+        """Initializes the fake repeat variable.
+
+        :param value: Initial repeat count value
+        :type value: str
+        """
         self._value = value
 
     def get(self) -> str:
-        """Returns the repeat value."""
+        """Returns the repeat value.
+
+        :return: Current repeat count as string
+        :rtype: str
+        """
         return self._value
 
 
 class FakePlayer:
-    """Fake player for testing macro playback."""
+    """Fake player for testing macro playback.
+
+    Tracks play and stop calls without actual playback.
+    """
 
     def __init__(self) -> None:
+        """Initializes the fake player.
+
+        Sets up tracking for play and stop calls.
+        """
         self.play_calls = []
         self.stop_calls = 0
 
     def play(self, macro: Macro, repeats: int) -> None:
-        """Records a play call."""
+        """Records a play call.
+
+        :param macro: Macro to play
+        :type macro: Macro
+        :param repeats: Number of times to repeat
+        :type repeats: int
+        :return: None
+        :rtype: None
+        """
         self.play_calls.append((macro, repeats))
 
     def stop(self) -> None:
-        """Records a stop call."""
+        """Records a stop call.
+
+        :return: None
+        :rtype: None
+        """
         self.stop_calls += 1
 
 
 class FakeRecorder:
-    """Fake recorder for testing macro recording."""
+    """Fake recorder for testing macro recording.
+
+    Simulates recording behavior with predefined events.
+    """
 
     def __init__(self, events=None) -> None:
+        """Initializes the fake recorder.
+
+        :param events: Predefined events to return on stop
+        :type events: list or None
+        """
         self.started = False
         self.ignored = None
         self._events = events or []
 
     def start(self, ignored_hotkeys) -> None:
-        """Simulates starting recording."""
+        """Simulates starting recording.
+
+        :param ignored_hotkeys: Hotkeys to ignore during recording
+        :return: None
+        :rtype: None
+        """
         self.started = True
         self.ignored = ignored_hotkeys
 
     def stop(self):
-        """Simulates stopping recording and returns events."""
+        """Simulates stopping recording and returns events.
+
+        :return: List of recorded events
+        :rtype: list
+        """
         return list(self._events)
 
 
 def _make_app() -> App:
-    """Creates an App instance without initialization."""
+    """Creates an App instance without initialization.
+
+    Creates a bare App instance using __new__ to bypass __init__,
+    allowing tests to set up only the necessary attributes.
+
+    :return: Uninitialized App instance
+    :rtype: App
+    """
     app = App.__new__(App)
     return app
 
 
 def test_app_log_writes_text() -> None:
-    """Tests that app log writes text to the log widget."""
+    """Tests that app log writes text to the log widget.
+
+    Verifies that the _log method correctly inserts text into the
+    log_text widget with proper newline formatting.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     app.log_text = FakeText()
 
@@ -148,7 +310,14 @@ def test_app_log_writes_text() -> None:
 
 
 def test_refresh_hotkey_labels_sets_text() -> None:
-    """Tests that hotkey labels are refreshed with correct text."""
+    """Tests that hotkey labels are refreshed with correct text.
+
+    Verifies that _refresh_hotkey_labels updates label text to show
+    formatted hotkey combinations or "(none)" for empty hotkeys.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     app.hotkeys = {"start_record": ["<ctrl>", "r"], "stop_record": []}
     app.hotkey_labels = {"start_record": FakeLabel(), "stop_record": FakeLabel()}
@@ -160,7 +329,14 @@ def test_refresh_hotkey_labels_sets_text() -> None:
 
 
 def test_handle_hotkey_calls_actions() -> None:
-    """Tests that hotkey handler calls the correct actions."""
+    """Tests that hotkey handler calls the correct actions.
+
+    Verifies that _handle_hotkey dispatches to the appropriate app
+    methods based on the action name.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     called = []
     app.start_recording = lambda: called.append("start_record")
@@ -191,7 +367,14 @@ def test_handle_hotkey_calls_actions() -> None:
 
 
 def test_populate_preview_inserts_rows() -> None:
-    """Tests that populate preview inserts rows for macro events."""
+    """Tests that populate preview inserts rows for macro events.
+
+    Verifies that _populate_preview correctly populates the treeview
+    with rows representing each event in the macro.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     app.preview = FakeTreeview()
     macro = Macro(
@@ -209,7 +392,14 @@ def test_populate_preview_inserts_rows() -> None:
 
 
 def test_populate_preview_clears_on_none() -> None:
-    """Tests that populate preview clears when given None."""
+    """Tests that populate preview clears when given None.
+
+    Verifies that _populate_preview removes all items when called with
+    None, effectively clearing the preview.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     app.preview = FakeTreeview()
     app.preview.insert("", "end", values=(1, "x", "y", 0))
@@ -220,7 +410,14 @@ def test_populate_preview_clears_on_none() -> None:
 
 
 def test_can_delete_events_logs_when_empty() -> None:
-    """Tests that can_delete_events logs when no macro is loaded."""
+    """Tests that can_delete_events logs when no macro is loaded.
+
+    Verifies that _can_delete_events returns False and logs an
+    appropriate message when current_macro is None.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     logs = []
     app._log = logs.append
@@ -231,7 +428,14 @@ def test_can_delete_events_logs_when_empty() -> None:
 
 
 def test_perform_deletion_updates_events() -> None:
-    """Tests that perform_deletion correctly removes events."""
+    """Tests that perform_deletion correctly removes events.
+
+    Verifies that _perform_deletion removes the specified events from
+    the current macro and updates the preview accordingly.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     app.preview = FakeTreeview()
     app.current_macro = Macro(
@@ -251,11 +455,23 @@ def test_perform_deletion_updates_events() -> None:
     populated = []
 
     def record_deleted(count: int) -> None:
-        """Records deletion count."""
+        """Records deletion count.
+
+        :param count: Number of items deleted
+        :type count: int
+        :return: None
+        :rtype: None
+        """
         deleted.append(count)
 
     def record_populated(macro: Macro | None) -> None:
-        """Records populated macro."""
+        """Records populated macro.
+
+        :param macro: Macro that was populated
+        :type macro: Macro | None
+        :return: None
+        :rtype: None
+        """
         populated.append(macro)
 
     app._log_deletion_result = record_deleted
@@ -270,7 +486,14 @@ def test_perform_deletion_updates_events() -> None:
 
 
 def test_start_recording_and_stop_recording() -> None:
-    """Tests start and stop recording functionality."""
+    """Tests start and stop recording functionality.
+
+    Verifies that start_recording and stop_recording properly manage
+    button states, recorder lifecycle, and macro creation from events.
+
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     app.start_rec_btn = FakeButton()
     app.stop_rec_btn = FakeButton()
@@ -290,7 +513,15 @@ def test_start_recording_and_stop_recording() -> None:
 
 
 def test_start_playback_validation_and_success(monkeypatch) -> None:
-    """Tests playback validation and successful playback."""
+    """Tests playback validation and successful playback.
+
+    Verifies that start_playback validates macro existence and repeat
+    count before initiating playback, and handles errors appropriately.
+
+    :param monkeypatch: Pytest monkeypatch fixture
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     warnings = []
     errors = []
@@ -321,7 +552,17 @@ def test_start_playback_validation_and_success(monkeypatch) -> None:
 
 
 def test_save_macro_flow(monkeypatch, tmp_path: Path) -> None:
-    """Tests the complete save macro flow."""
+    """Tests the complete save macro flow.
+
+    Verifies that save_macro validates macro existence, prompts for
+    file path, updates macro name, and saves to CSV correctly.
+
+    :param monkeypatch: Pytest monkeypatch fixture
+    :param tmp_path: Pytest temporary directory fixture
+    :type tmp_path: Path
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     warnings = []
     monkeypatch.setattr(app_module, "messagebox", SimpleNamespace(
@@ -354,7 +595,17 @@ def test_save_macro_flow(monkeypatch, tmp_path: Path) -> None:
 
 
 def test_load_macro_flow(monkeypatch, tmp_path: Path) -> None:
-    """Tests the complete load macro flow."""
+    """Tests the complete load macro flow.
+
+    Verifies that load_macro prompts for file path, loads from CSV,
+    handles empty files, and updates the current macro and preview.
+
+    :param monkeypatch: Pytest monkeypatch fixture
+    :param tmp_path: Pytest temporary directory fixture
+    :type tmp_path: Path
+    :return: None
+    :rtype: None
+    """
     app = _make_app()
     errors = []
     monkeypatch.setattr(app_module, "messagebox", SimpleNamespace(
