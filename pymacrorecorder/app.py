@@ -36,6 +36,20 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.player = Player(self._log, on_completion=self._on_playback_complete)
         self.current_macro: Optional[Macro] = None
 
+        # Initialize UI attributes
+        self.start_rec_btn: ttk.Button = None  # type: ignore
+        self.stop_rec_btn: ttk.Button = None  # type: ignore
+        self.start_play_btn: ttk.Button = None  # type: ignore
+        self.stop_play_btn: ttk.Button = None  # type: ignore
+        self.save_btn: ttk.Button = None  # type: ignore
+        self.load_btn: ttk.Button = None  # type: ignore
+        self.delete_btn: ttk.Button = None  # type: ignore
+        self.repeat_var: tk.StringVar = None  # type: ignore
+        self.repeat_entry: ttk.Entry = None  # type: ignore
+        self.preview: ttk.Treeview = None  # type: ignore
+        self.log_text: tk.Text = None  # type: ignore
+        self.hotkey_labels: Dict[str, tk.Label] = {}
+
         self._build_ui()
         self._refresh_hotkey_labels()
         self.hotkey_manager = HotkeyManager(self.hotkeys, self._dispatch_hotkey)
@@ -76,6 +90,18 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         :return: Nothing.
         :rtype: None
         """
+        self._build_control_bar()
+        self._build_repeat_frame()
+        self._build_preview_tree()
+        self._build_log_area()
+        self._build_hotkey_editor()
+
+    def _build_control_bar(self) -> None:
+        """Build the control bar with recording, playback, and file buttons.
+
+        :return: Nothing.
+        :rtype: None
+        """
         controls = ttk.Frame(self)
         controls.pack(fill="x", padx=10, pady=5)
 
@@ -98,6 +124,12 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.load_btn.grid(row=0, column=5, padx=5, pady=2)
         self.delete_btn.grid(row=0, column=6, padx=5, pady=2)
 
+    def _build_repeat_frame(self) -> None:
+        """Build the repeat count input frame.
+
+        :return: Nothing.
+        :rtype: None
+        """
         repeat_frame = ttk.Frame(self)
         repeat_frame.pack(fill="x", padx=10, pady=2)
         ttk.Label(repeat_frame, text="Repeats (0 = infinite):").pack(side="left")
@@ -105,6 +137,12 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.repeat_entry = ttk.Entry(repeat_frame, textvariable=self.repeat_var, width=6)
         self.repeat_entry.pack(side="left", padx=5)
 
+    def _build_preview_tree(self) -> None:
+        """Build the event preview tree widget.
+
+        :return: Nothing.
+        :rtype: None
+        """
         preview_frame = ttk.LabelFrame(self, text="Event preview")
         preview_frame.pack(fill="both", expand=True, padx=10, pady=5)
         columns = ("#", "type", "details", "delay")
@@ -118,14 +156,25 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.preview.pack(fill="both", expand=True)
         self.preview.bind("<Delete>", lambda e: self._delete_selected_events())
 
+    def _build_log_area(self) -> None:
+        """Build the log text area.
+
+        :return: Nothing.
+        :rtype: None
+        """
         log_frame = ttk.LabelFrame(self, text="Log")
         log_frame.pack(fill="both", expand=True, padx=10, pady=5)
         self.log_text = tk.Text(log_frame, height=8, state="disabled")
         self.log_text.pack(fill="both", expand=True)
 
+    def _build_hotkey_editor(self) -> None:
+        """Build the hotkey configuration editor.
+
+        :return: Nothing.
+        :rtype: None
+        """
         hotkey_frame = ttk.LabelFrame(self, text="Hotkeys")
         hotkey_frame.pack(fill="x", padx=10, pady=5)
-        self.hotkey_labels: Dict[str, tk.Label] = {}
         row = 0
         for action, label in [
             ("start_record", "Start Record"),
@@ -248,23 +297,55 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         :return: Nothing.
         :rtype: None
         """
-        if not self.current_macro or self.current_macro.is_empty():
-            self._log("No macro to edit")
+        if not self._can_delete_events():
             return
         selection = list(self.preview.selection())
         if not selection:
             self._log("No rows selected for deletion")
             return
+        self._perform_deletion(selection)
+
+    def _can_delete_events(self) -> bool:
+        """Check if deletion is possible.
+
+        :return: ``True`` if macro exists and is not empty.
+        :rtype: bool
+        """
+        if not self.current_macro or self.current_macro.is_empty():
+            self._log("No macro to edit")
+            return False
+        return True
+
+    def _perform_deletion(self, selection: List[str]) -> None:
+        """Remove events at the selected indices and update preview.
+
+        :param selection: List of selected item IDs from the tree view.
+        :type selection: list[str]
+        :return: Nothing.
+        :rtype: None
+        """
         # Remove events in reverse order to keep indexes stable while popping
         indexes = sorted((self.preview.index(item) for item in selection), reverse=True)
+        deleted_count = 0
         for idx in indexes:
             if 0 <= idx < len(self.current_macro.events):
                 self.current_macro.events.pop(idx)
+                deleted_count += 1
+        self._log_deletion_result(deleted_count)
+        self._populate_preview(self.current_macro if not self.current_macro.is_empty() else None)
+
+    def _log_deletion_result(self, count: int) -> None:
+        """Log the deletion result.
+
+        :param count: Number of events deleted.
+        :type count: int
+        :return: Nothing.
+        :rtype: None
+        """
         if self.current_macro.is_empty():
             self._log("All events deleted from macro")
         else:
-            self._log(f"Deleted {len(indexes)} event(s) from macro")
-        self._populate_preview(self.current_macro if not self.current_macro.is_empty() else None)
+            self._log(f"Deleted {count} event(s) from macro")
 
     def start_playback(self) -> None:
         """Start macro playback with the configured repeat count.
