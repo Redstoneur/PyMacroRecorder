@@ -1,5 +1,31 @@
 # PyMacroRecorder
 
+---
+
+![License](https://img.shields.io/github/license/Redstoneur/PyMacroRecorder)
+![Top Language](https://img.shields.io/github/languages/top/Redstoneur/PyMacroRecorder)
+![Python Version](https://img.shields.io/badge/python-3.14.0-blue)
+![Size](https://img.shields.io/github/repo-size/Redstoneur/PyMacroRecorder)
+![Contributors](https://img.shields.io/github/contributors/Redstoneur/PyMacroRecorder)
+![Last Commit](https://img.shields.io/github/last-commit/Redstoneur/PyMacroRecorder)
+![Issues](https://img.shields.io/github/issues/Redstoneur/PyMacroRecorder)
+![Pull Requests](https://img.shields.io/github/issues-pr/Redstoneur/PyMacroRecorder)
+
+---
+
+![Forks](https://img.shields.io/github/forks/Redstoneur/PyMacroRecorder)
+![Stars](https://img.shields.io/github/stars/Redstoneur/PyMacroRecorder)
+![Watchers](https://img.shields.io/github/watchers/Redstoneur/PyMacroRecorder)
+
+---
+
+![Latest Release](https://img.shields.io/github/v/release/Redstoneur/PyMacroRecorder)
+![Release Date](https://img.shields.io/github/release-date/Redstoneur/PyMacroRecorder)
+[![Build Status](https://github.com/Redstoneur/PyMacroRecorder/actions/workflows/ci.yml/badge.svg)](https://github.com/Redstoneur/PyMacroRecorder/actions/workflows/ci.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1626228dee914e71b2805544b1b5094d)](https://app.codacy.com/gh/Redstoneur/PyMacroRecorder/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
+---
+
 Tkinter app to record, play, and save keyboard/mouse macros.
 
 ## Features
