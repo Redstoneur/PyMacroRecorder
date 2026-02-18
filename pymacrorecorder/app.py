@@ -326,10 +326,12 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         """
         # Remove events in reverse order to keep indexes stable while popping
         indexes = sorted((self.preview.index(item) for item in selection), reverse=True)
+        deleted_count = 0
         for idx in indexes:
             if 0 <= idx < len(self.current_macro.events):
                 self.current_macro.events.pop(idx)
-        self._log_deletion_result(len(indexes))
+                deleted_count += 1
+        self._log_deletion_result(deleted_count)
         self._populate_preview(self.current_macro if not self.current_macro.is_empty() else None)
 
     def _log_deletion_result(self, count: int) -> None:
