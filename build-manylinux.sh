@@ -53,7 +53,7 @@ source venv/bin/activate
 
 echo "=== Installing deps ==="
 pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt pyinstaller
+pip install -r requirements.txt
 
 # Ensure PyInstaller finds libpython
 export LD_LIBRARY_PATH="$(python -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))'):$LD_LIBRARY_PATH"
