@@ -25,5 +25,5 @@ pyinstaller --onefile --noconsole `
   --workpath "$BuildDir" `
   "$EntryPoint"
 
-Write-Host "Build complete. Binary located at: $DistDir\$AppName.exe"
+Write-Output "Build complete. Binary located at: $DistDir\$AppName.exe"
 
