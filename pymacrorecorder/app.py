@@ -248,23 +248,53 @@ class App(tk.Tk):  # pylint: disable=too-many-instance-attributes
         :return: Nothing.
         :rtype: None
         """
-        if not self.current_macro or self.current_macro.is_empty():
-            self._log("No macro to edit")
+        if not self._can_delete_events():
             return
         selection = list(self.preview.selection())
         if not selection:
             self._log("No rows selected for deletion")
             return
+        self._perform_deletion(selection)
+
+    def _can_delete_events(self) -> bool:
+        """Check if deletion is possible.
+
+        :return: ``True`` if macro exists and is not empty.
+        :rtype: bool
+        """
+        if not self.current_macro or self.current_macro.is_empty():
+            self._log("No macro to edit")
+            return False
+        return True
+
+    def _perform_deletion(self, selection: List[str]) -> None:
+        """Remove events at the selected indices and update preview.
+
+        :param selection: List of selected item IDs from the tree view.
+        :type selection: list[str]
+        :return: Nothing.
+        :rtype: None
+        """
         # Remove events in reverse order to keep indexes stable while popping
         indexes = sorted((self.preview.index(item) for item in selection), reverse=True)
         for idx in indexes:
             if 0 <= idx < len(self.current_macro.events):
                 self.current_macro.events.pop(idx)
+        self._log_deletion_result(len(indexes))
+        self._populate_preview(self.current_macro if not self.current_macro.is_empty() else None)
+
+    def _log_deletion_result(self, count: int) -> None:
+        """Log the deletion result.
+
+        :param count: Number of events deleted.
+        :type count: int
+        :return: Nothing.
+        :rtype: None
+        """
         if self.current_macro.is_empty():
             self._log("All events deleted from macro")
         else:
-            self._log(f"Deleted {len(indexes)} event(s) from macro")
-        self._populate_preview(self.current_macro if not self.current_macro.is_empty() else None)
+            self._log(f"Deleted {count} event(s) from macro")
 
     def start_playback(self) -> None:
         """Start macro playback with the configured repeat count.

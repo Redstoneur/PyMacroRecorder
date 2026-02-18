@@ -107,25 +107,73 @@ class Player:
         :return: Nothing.
         :rtype: None
         """
-        etype = event.event_type
-        data = event.payload
-        if etype == "key_down":
-            self._keyboard.press(str_to_key(data.get("key", "")))
-        elif etype == "key_up":
-            self._keyboard.release(str_to_key(data.get("key", "")))
-        elif etype == "mouse_click":
-            button = str_to_button(data.get("button", "left"))
-            action = data.get("action", "press")
-            x = data.get("x")
-            y = data.get("y")
-            if x is not None and y is not None:
-                self._mouse.position = (x, y)
-            if action == "press":
-                self._mouse.press(button)
-            else:
-                self._mouse.release(button)
-        elif etype == "mouse_scroll":
-            self._mouse.position = (data.get("x", 0), data.get("y", 0))
-            self._mouse.scroll(data.get("dx", 0), data.get("dy", 0))
-        elif etype == "mouse_move":
-            self._mouse.position = (data.get("x", 0), data.get("y", 0))
+        handlers = {
+            "key_down": self._handle_key_down,
+            "key_up": self._handle_key_up,
+            "mouse_click": self._handle_mouse_click,
+            "mouse_scroll": self._handle_mouse_scroll,
+            "mouse_move": self._handle_mouse_move,
+        }
+        handler = handlers.get(event.event_type)
+        if handler:
+            handler(event.payload)
+
+    def _handle_key_down(self, data: dict) -> None:
+        """Handle key down event.
+
+        :param data: Event payload.
+        :type data: dict
+        :return: Nothing.
+        :rtype: None
+        """
+        self._keyboard.press(str_to_key(data.get("key", "")))
+
+    def _handle_key_up(self, data: dict) -> None:
+        """Handle key up event.
+
+        :param data: Event payload.
+        :type data: dict
+        :return: Nothing.
+        :rtype: None
+        """
+        self._keyboard.release(str_to_key(data.get("key", "")))
+
+    def _handle_mouse_click(self, data: dict) -> None:
+        """Handle mouse click event.
+
+        :param data: Event payload.
+        :type data: dict
+        :return: Nothing.
+        :rtype: None
+        """
+        button = str_to_button(data.get("button", "left"))
+        action = data.get("action", "press")
+        x = data.get("x")
+        y = data.get("y")
+        if x is not None and y is not None:
+            self._mouse.position = (x, y)
+        if action == "press":
+            self._mouse.press(button)
+        else:
+            self._mouse.release(button)
+
+    def _handle_mouse_scroll(self, data: dict) -> None:
+        """Handle mouse scroll event.
+
+        :param data: Event payload.
+        :type data: dict
+        :return: Nothing.
+        :rtype: None
+        """
+        self._mouse.position = (data.get("x", 0), data.get("y", 0))
+        self._mouse.scroll(data.get("dx", 0), data.get("dy", 0))
+
+    def _handle_mouse_move(self, data: dict) -> None:
+        """Handle mouse move event.
+
+        :param data: Event payload.
+        :type data: dict
+        :return: Nothing.
+        :rtype: None
+        """
+        self._mouse.position = (data.get("x", 0), data.get("y", 0))
